@@ -4,10 +4,11 @@ from dotenv import load_dotenv
 from GetRedditPost import get_top_reddit_posts
 from tts import tts_output
 from text_preprocessor import preprocess_text, text_to_chunks
+from subtitles import transcriber, generate_srt
 
 POST_LIMIT = 1
 ELEVEN_LABS_VOICE_ID = "pNInz6obpgDQGcFmaJgB"
-OUTPUT_FOLDER = "output"
+AUDIO_OUTPUT_FOLDER = "audio output"
 
 load_dotenv('eleven_labs.env')
 load_dotenv('reddit.env')
@@ -34,13 +35,17 @@ if __name__ == "__main__":
             text_chunks = text_to_chunks(text_to_convert)
                        
             current_time = datetime.datetime.now().strftime("%Y-%m-%d")
-            if not os.path.exists(OUTPUT_FOLDER):
-                os.makedirs(OUTPUT_FOLDER)
+            if not os.path.exists(AUDIO_OUTPUT_FOLDER):
+                os.makedirs(AUDIO_OUTPUT_FOLDER)
 
             for chunk_index, chunk in enumerate(text_chunks):
-                output_filename = os.path.join(OUTPUT_FOLDER, f"{subreddit}_{current_time}_part{chunk_index + 1}.mp3")
+                output_filename = os.path.join(AUDIO_OUTPUT_FOLDER, f"{subreddit}_{current_time}_part{chunk_index + 1}.mp3")
                 print(f"Audio will be saved as {output_filename}")
                 tts_output(chunk, voice_id=ELEVEN_LABS_VOICE_ID, filename=output_filename)
+
+                transcription, segments = transcriber(output_filename)
+                print(f"Transcription: {transcription}")
+                generate_srt(segments, output_file=f"{subreddit}_{current_time}_post{i + 1}_subtitles.srt")
     
 
 
