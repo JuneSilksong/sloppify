@@ -3,15 +3,19 @@ from dotenv import load_dotenv
 from elevenlabs import ElevenLabs
 from elevenlabs import VoiceSettings
 
+from text_preprocessor import preprocess_text
+
 load_dotenv('eleven_labs.env')
 
 
 API_KEY = os.getenv("ELEVEN_LABS_API_KEY")
+
+
 client = ElevenLabs(api_key=API_KEY)
 
 voice_id = "pNInz6obpgDQGcFmaJgB"
 output_format = "mp3_44100_128"
-model_id = "eleven_multilingual_v2" 
+model_id = "eleven_flash_v2" 
 
 def tts_output(text, voice_id, filename="tts_output.mp3"):
 
