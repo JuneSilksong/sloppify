@@ -5,4 +5,5 @@ sloppify-venv/
 *.srt
 *.mp4
 *.webm
+*.json
 tempCodeRunnerFile.py

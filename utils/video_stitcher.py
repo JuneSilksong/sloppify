@@ -27,7 +27,7 @@ def stitch_video(video_file_name: str, music_file_name: str, tts_audio_file_name
     final = cropped.set_audio(audio)   
     final = final.subclip(0, duration)
 
-    final.write_videofile(f"output/{tts_audio_file}.mp4", codec="libx264", audio_codec="aac", fps=60)
+    final.write_videofile(f"output/test.mp4", codec="libx264", audio_codec="aac", fps=60)
 
 video_file = "youtube_minecraft_parkour_1440p.webm"
 music_file = "youtube_joyful_chess.mp3"
