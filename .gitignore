@@ -3,3 +3,6 @@ sloppify-venv/
 *.wav
 *.pyc
 *.srt
+*.mp4
+*.webm
+tempCodeRunnerFile.py
