@@ -1,10 +1,10 @@
 import os
 import datetime
 from dotenv import load_dotenv
-from GetRedditPost import get_top_reddit_posts
 from tts import tts_output
-from text_preprocessor import preprocess_text, text_to_chunks
-from subtitles import transcriber, generate_srt
+from utils.get_reddit_post import get_top_reddit_posts
+from utils.text_preprocessor import preprocess_text, text_to_chunks
+from utils.subtitles import transcriber, generate_srt
 
 POST_LIMIT = 1
 ELEVEN_LABS_VOICE_ID = "pNInz6obpgDQGcFmaJgB"
