@@ -1,10 +1,5 @@
+input/
+output/
 sloppify-venv/
-*.mp3
-*.wav
-*.pyc
-*.srt
-*.mp4
-*.webm
 *.json
 *.pickle
-tempCodeRunnerFile.py
