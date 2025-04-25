@@ -1,8 +1,9 @@
-from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip
+from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, TextClip
 from typing import List, Tuple
 import random
+# import pysrt
 
-def stitch_video(video_file_name: str, music_file_name: str, tts_audio_file_name: str): #add tts_srt: str later
+def stitch_video(video_file_name: str, music_file_name: str, tts_audio_file_name: str, title: str ="TIFU xyz"): #add tts_srt: str later
 
     video_file = f"input/webm/{video_file_name}"
     music_file = f"input/mp3/{music_file_name}"
@@ -24,10 +25,24 @@ def stitch_video(video_file_name: str, music_file_name: str, tts_audio_file_name
 
     start_time = random.randint(1,int(video.duration-duration-10))
     cropped = cropped.subclip(start_time)
-    final = cropped.set_audio(audio)   
+    final = cropped.set_audio(audio)   # remove this line once srt is ready
+    """
+    subs = pysrt.open(tts_srt)
+    subtitles = []
+
+    for sub in subs:
+    txt = TextClip(sub.text, fontsize=48, color'white', stroke_color='black', stroke_width=2, font='Arial-Bold')
+    txt = txt.set_start(sub.start.ordinal / 1000).set_duration(sub.duration.seconds + sub.duration.milliseconds / 1000)
+    txt = txt.set_position(('center', 'bottom'))
+    subtitles.append(txt)
+
+    final = CompositeVideoClip(cropped.set_audio(audio) + subtitles)
+
+    """
+
     final = final.subclip(0, duration)
 
-    final.write_videofile(f"output/test.mp4", codec="libx264", audio_codec="aac", fps=60)
+    final.write_videofile(f"output/{title}.mp4", codec="libx264", audio_codec="aac", fps=60)
 
 """
 video_file = "youtube_minecraft_parkour_1440p.webm"
