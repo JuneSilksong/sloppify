@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from elevenlabs import ElevenLabs
+from elevenlabs import VoiceSettings
 
 load_dotenv('eleven_labs.env')
 
@@ -20,7 +21,14 @@ def tts_output(text, voice_id, filename="tts_output.mp3"):
             voice_id=voice_id,
             output_format=output_format,
             text=text,
-            model_id=model_id
+            model_id=model_id,
+            voice_settings=VoiceSettings(
+                stability=0.25,
+                similarity_boost=.3,
+                style=0.2,
+                speed=1.12,
+        
+            )
         )
 
         if isinstance(response, bytes):
@@ -37,6 +45,3 @@ def tts_output(text, voice_id, filename="tts_output.mp3"):
         print(f"Error processing audio data: {e}")
         print(f"Response content: {response}")
 
-if __name__ == "__main__":
-    text = "If you shit in the sink at exactly 4:20 am and yell “amogus” 69 times,a shadowy figured called mom will come to beat you up and you will wake up in a place called the orphanage "
-    tts_output(text, voice_id, "elevenlabs_output.mp3")
