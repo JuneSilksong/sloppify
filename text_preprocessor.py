@@ -12,6 +12,7 @@ def preprocess_text(text):
         r"ass": "booty",
         r"tits": "bazoingas",
         r"boobs": "bazoingas",
+        r"OMG": "oh my glob",
 
         
     }

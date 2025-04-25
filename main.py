@@ -38,7 +38,7 @@ if __name__ == "__main__":
                 os.makedirs(OUTPUT_FOLDER)
 
             for chunk_index, chunk in enumerate(text_chunks):
-                output_filename = os.path.join(OUTPUT_FOLDER, f"{subreddit}_{title}_part{chunk_index + 1}.mp3")
+                output_filename = os.path.join(OUTPUT_FOLDER, f"{subreddit}_{current_time}_part{chunk_index + 1}.mp3")
                 print(f"Audio will be saved as {output_filename}")
                 tts_output(chunk, voice_id=ELEVEN_LABS_VOICE_ID, filename=output_filename)
     
