@@ -28,7 +28,7 @@ if __name__ == "__main__":
             print(f"Title: {title}")
             print(f"Selftext: {selftext}\n")
 
-            text_to_convert = f"Title: {title}\n{selftext}"
+            text_to_convert = f"{title}\n{selftext}"
 
             text_to_convert = preprocess_text(text_to_convert)
             text_chunks = text_to_chunks(text_to_convert)
