@@ -8,6 +8,10 @@ def preprocess_text(text):
         r"/s": "slash s",          
         r"TIFU": "Today I flipped Up",
         r"AITA": "Am I the a-hole?", 
+        r"Fuck": "frick",
+        r"ass": "booty",
+        r"tits": "bazoingas",
+        r"boobs": "bazoingas",
 
         
     }

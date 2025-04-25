@@ -7,6 +7,7 @@ from text_preprocessor import preprocess_text, text_to_chunks
 
 POST_LIMIT = 1
 ELEVEN_LABS_VOICE_ID = "pNInz6obpgDQGcFmaJgB"
+OUTPUT_FOLDER = "output"
 
 load_dotenv('eleven_labs.env')
 load_dotenv('reddit.env')
@@ -33,12 +34,13 @@ if __name__ == "__main__":
             text_chunks = text_to_chunks(text_to_convert)
                        
             current_time = datetime.datetime.now().strftime("%Y-%m-%d")
+            if not os.path.exists(OUTPUT_FOLDER):
+                os.makedirs(OUTPUT_FOLDER)
 
             for chunk_index, chunk in enumerate(text_chunks):
-                output_filename = f"{subreddit}_{current_time}_post{i + 1}_part{chunk_index + 1}.mp3"
+                output_filename = os.path.join(OUTPUT_FOLDER, f"{subreddit}_{title}_part{chunk_index + 1}.mp3")
                 print(f"Audio will be saved as {output_filename}")
                 tts_output(chunk, voice_id=ELEVEN_LABS_VOICE_ID, filename=output_filename)
-        
-        print(f"Audio saved as {output_filename}")
+    
 
 
