@@ -1,4 +1,5 @@
 sloppify-venv/
-elevenlabs_output.mp3
+*.mp3
 __pycache__/GetRedditPost.cpython-312.pyc
 __pycache__/tts.cpython-312.pyc
+*.pyc
