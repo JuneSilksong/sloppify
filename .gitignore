@@ -1,3 +1,4 @@
 sloppify-venv/
 *.mp3
+*.wav
 *.pyc
