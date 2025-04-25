@@ -6,4 +6,5 @@ sloppify-venv/
 *.mp4
 *.webm
 *.json
+*.pickle
 tempCodeRunnerFile.py
