@@ -3,3 +3,4 @@ output/
 sloppify-venv/
 *.json
 *.pickle
+*.srt
