@@ -1,8 +1,12 @@
 import whisper
 import datetime
+import torch
 
 def transcriber(audio_file):
-    model = whisper.load_model("medium")
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    model = whisper.load_model("large").to(device)
     
 
     audio = whisper.load_audio(audio_file)
