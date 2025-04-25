@@ -4,3 +4,6 @@ sloppify-venv/
 *.json
 *.pickle
 *.srt
+*.wav
+*.mp3
+*.pyc
