@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from elevenlabs import ElevenLabs
 from elevenlabs import VoiceSettings
 
-from text_preprocessor import preprocess_text
+from utils.text_preprocessor import preprocess_text
 
 load_dotenv('eleven_labs.env')
 

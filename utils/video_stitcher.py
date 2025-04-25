@@ -29,8 +29,10 @@ def stitch_video(video_file_name: str, music_file_name: str, tts_audio_file_name
 
     final.write_videofile(f"output/test.mp4", codec="libx264", audio_codec="aac", fps=60)
 
+"""
 video_file = "youtube_minecraft_parkour_1440p.webm"
 music_file = "youtube_joyful_chess.mp3"
 tts_audio_file = "TIFU_TIFU by asking what a guy who hates me said about me in a group chat_part1.mp3"
 
 stitch_video(video_file,music_file,tts_audio_file)
+"""
