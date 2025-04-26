@@ -1,7 +1,7 @@
 import os
 import datetime
 from dotenv import load_dotenv
-from tts import tts_output
+from utils.tts import tts_output
 from utils.get_reddit_post import get_top_reddit_posts
 from utils.text_preprocessor import preprocess_text, text_to_chunks
 from utils.subtitles import transcriber, generate_srt
