@@ -43,7 +43,7 @@ if __name__ == "__main__":
                 else:
                     print(f"Generating TTS for post {post_id}…")
 
-                text = f"Title: {title}\n{selftext}"
+                text = f"{title}\n{selftext}"
                 text = preprocess_text(text)
                 chunks = text_to_chunks(text)
 

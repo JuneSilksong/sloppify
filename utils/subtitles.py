@@ -44,14 +44,27 @@ def generate_srt(
 
     subs = []
     chunk = []
-    for w in words:
+    n = len(words)
+    i = 0
+
+    while i < n:
+        w = words[i]
+        word_text = w.get("word", "").strip()
+
         chunk.append(w)
-        word_text = w.get("word", "")
-        if word_text.endswith(('.', ',', '!', '?')) or len(chunk) >= max_words:
+
+        is_sentence_end = word_text.endswith(('.', ',', '!', '?'))
+        is_hyphen_next  = (i+1 < n) and words[i+1].get("word", "").startswith("-")
+
+        if is_sentence_end or (len(chunk) >= max_words and not is_hyphen_next):
             subs.append(chunk)
             chunk = []
+
+        i += 1
+
     if chunk:
         subs.append(chunk)
+
 
     with open(srt_path, "w", encoding="utf-8") as f:
         for idx, chunk in enumerate(subs, start=1):

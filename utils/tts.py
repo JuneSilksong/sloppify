@@ -30,7 +30,7 @@ def tts_output(text, voice_id, filename="tts_output.mp3"):
                 stability=0.25,
                 similarity_boost=.3,
                 style=0.2,
-                speed=1.12,
+                speed=1.05,
         
             )
         )
