@@ -9,10 +9,20 @@ def preprocess_text(text):
         r"TIFU": "Today I flipped Up",
         r"AITA": "Am I the a-hole?", 
         r"Fuck": "frick",
+        r"asshole": "a-hole",
         r"ass": "booty",
         r"tits": "bazoingas",
         r"boobs": "bazoingas",
         r"OMG": "oh my glob",
+        r"porn": "corn",
+        r"WTF": "WHAT THE FLIP!",
+        r"and": "&",
+        r"an": "&",
+        r"cum": "splooge",
+        r"cummed": "shot rope",
+        r"suicide": "sewer slide",
+        r"kill": "unalive",
+        r"killed": "unalived",
 
         
     }
