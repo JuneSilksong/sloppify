@@ -1,5 +1,6 @@
 import os
 import praw
+import yt_dlp
 from dotenv import load_dotenv
 from typing import List, Tuple
 
@@ -37,7 +38,17 @@ def get_top_reddit_posts(
     top_reddit_posts: List[Tuple[str, str]] = []
 
     for p in posts:
-        if p.is_self and not p.stickied:
-            top_reddit_posts.append((p.title, p.selftext, p.url))
+        if not p.stickied:
+            if p.is_self:
+                top_reddit_posts.append((p.title, p.selftext))
+            if p.is_video:
+                ydl_opts = {
+                    'format': 'bv',
+                    'outtmpl': 'input/mp4/%(title)s.%(ext)s',
+                }
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([p.url])
     
     return top_reddit_posts
+
+get_top_reddit_posts(subreddit="funnyanimals",limit=1)
