@@ -1,65 +1,83 @@
 from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, TextClip
 from typing import List, Tuple
+import textwrap
 import random
 import pysrt
 from moviepy.config import change_settings
+import os
 
 change_settings({"IMAGEMAGICK_BINARY": r"C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe"})
 
 def stitch_video(
-    video_file_name: str = None,
-    music_file_name: str = None,
-    tts_audio_file_name: str = None,
-    tts_srt_file_name: str = None,
+    video_file: str = None,
+    music_file: str = None,
+    tts_audio_file: str = None,
+    tts_srt_file: str = None,
+    content_video_file: str = None,
+    content_image_file: str = None,
     title: str = None
 ):
+    # General resolution parameters
+    height=1440
+    width=810
+    content_height=1120
+    content_width=630
     
     # Check if we have background video
-    if not video_file_name:
+    if not video_file:
         raise ValueError("video_file_name is required.")
+        
+    if content_video_file and content_image_file:
+        raise ValueError("content conflict between video and image")
 
     # Process video to 9:16
-    video_file = f"input/webm/{video_file_name}"
-    video = VideoFileClip(video_file)
-    resized = video.resize(height=1440)
-    cropped = resized.crop(x_center=resized.w/2, width=810)
+    video = VideoFileClip(f"input/webm/{video_file}")
+    resized = video.resize(height=height)
+    cropped = resized.crop(x_center=resized.w/2, width=width)
 
     # Load music
-    if music_file_name:
-        music_file = f"input/mp3/{music_file_name}"
-        music = AudioFileClip(music_file).volumex(0.05)
+    if music_file:
+        music = AudioFileClip(f"input/mp3/{music_file}")
     else:
         music = None
     
     # Load TTS audio
-    if tts_audio_file_name:
-        tts_audio_file = f"input/tts/{tts_audio_file_name}"
-        tts_audio = AudioFileClip(tts_audio_file).volumex(0.6) 
+    if tts_audio_file:
+        tts_audio = AudioFileClip(f"input/tts/{tts_audio_file}")
     else:
         tts_audio = None
 
     # Process audio
     if tts_audio and music:
         music = music.set_duration(tts_audio.duration)
-        audio = CompositeAudioClip([music,tts_audio])
+        audio = CompositeAudioClip([music.volumex(0.05),tts_audio.volumex(0.6)])
     elif tts_audio:
-        audio = tts_audio
+        audio = tts_audio.volumex(0.6) 
     elif music:
-        audio = music
+        audio = music.volumex(0.5)
     else:
         audio = None
+
+    # Process content video
+    if content_video_file:
+        content_video = VideoFileClip(f"input/mp4/{content_video_file}")
+        if content_video.h/16 >= content_video.w/9:
+            content_resized = content_video.resize(height=content_height)
+        else:
+            content_resized = content_video.resize(width=content_width)
     
     # Set background video to start at random point and attach any audio
-    duration = min(audio.duration if audio else cropped.duration, cropped.duration, 5)
+    duration = max(content_video.duration if content_video_file else 0, tts_audio.duration if tts_audio else 0)
+    if duration == 0:
+        duration = 10
     start_time = random.randint(1,int(video.duration-duration-10))
     cropped = cropped.subclip(start_time)
     if audio:
         cropped = cropped.set_audio(audio)
 
     # Add subtitles
-    if tts_srt_file_name:
-        tts_srt_file = f"input/srt/{tts_srt_file_name}"
-        subs = pysrt.open(tts_srt_file)
+    if tts_srt_file:
+        subs = pysrt.open(f"input/srt/{tts_srt_file}")
         subtitles = []
         for sub in subs:
             txt = TextClip(sub.text, fontsize=72, color='yellow', stroke_color='black', stroke_width=5, font='Segoe-UI-Black')
@@ -67,9 +85,15 @@ def stitch_video(
             txt = txt.set_position(('center', 0.6), relative=True)
             subtitles.append(txt)
         final = CompositeVideoClip(([cropped] + subtitles))
-    else:
-        final = cropped
-
+    elif content_resized:
+        txt = TextClip(textwrap.fill(os.path.splitext(content_video_file)[0],width=content_width-40), fontsize=36, color='white', stroke_color='black', stroke_width=2, font='Segoe-UI-Black', method='caption', size=(content_width-20, None))
+        txt = txt.set_start(0).set_duration(cropped.duration)
+        txt = txt.set_position(('center', 0.05), relative=True)
+        print("Content video duration:", content_video.duration)
+        final = CompositeVideoClip(([cropped] + [content_resized.set_position(('center', 0.15), relative=True)] + [txt]))
+    
     # Crop video to duration length and write
     final = final.subclip(0, duration)
-    final.write_videofile(f"output/{title}.mp4", codec="libx264", audio_codec="aac", fps=60)
+    final.write_videofile(f"output/{title if title else content_video_file if content_video_file else None}", codec="libx264", audio_codec="aac", fps=60)
+
+# e.g: stitch_video(video_file="nature_drone.mkv",music_file="ambient_music.mp3",content_video_file="Dad, you're not actually going to put them back... right？.mp4")
