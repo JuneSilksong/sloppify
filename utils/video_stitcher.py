@@ -17,12 +17,12 @@ def stitch_video(
     content_image_file: str = None,
     title: str = None
 ):
-    # General resolution parameters
+    # General parameters
     height=1440
     width=810
     content_height=1120
     content_width=630
-    
+
     # Check if we have background video
     if not video_file:
         raise ValueError("video_file_name is required.")
@@ -85,15 +85,19 @@ def stitch_video(
             txt = txt.set_position(('center', 0.6), relative=True)
             subtitles.append(txt)
         final = CompositeVideoClip(([cropped] + subtitles))
+
+    # Alternatively, add the content (no subtitles)
     elif content_resized:
-        txt = TextClip(textwrap.fill(os.path.splitext(content_video_file)[0],width=content_width-40), fontsize=36, color='white', stroke_color='black', stroke_width=2, font='Segoe-UI-Black', method='caption', size=(content_width-20, None))
+        wrapped_txt = textwrap.fill(os.path.splitext(content_video_file)[0],width=30)
+        print(wrapped_txt, wrapped_txt.count('\n'))
+        fontsize = 40
+        y_pos = 0.05 - ((wrapped_txt.count('\n') + 1) * fontsize - fontsize) / 2 / 1080
+        txt = TextClip(wrapped_txt, fontsize=fontsize, color='white', stroke_color='black', stroke_width=2, font='Segoe-UI-Black', method='caption', size=(content_width-20, None))
         txt = txt.set_start(0).set_duration(cropped.duration)
-        txt = txt.set_position(('center', 0.05), relative=True)
+        txt = txt.set_position(('center', y_pos), relative=True)
         print("Content video duration:", content_video.duration)
         final = CompositeVideoClip(([cropped] + [content_resized.set_position(('center', 0.15), relative=True)] + [txt]))
     
     # Crop video to duration length and write
     final = final.subclip(0, duration)
     final.write_videofile(f"output/{title if title else content_video_file if content_video_file else None}", codec="libx264", audio_codec="aac", fps=60)
-
-# e.g: stitch_video(video_file="nature_drone.mkv",music_file="ambient_music.mp3",content_video_file="Dad, you're not actually going to put them back... right？.mp4")
