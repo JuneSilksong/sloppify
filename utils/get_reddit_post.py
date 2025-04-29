@@ -8,7 +8,7 @@ def get_top_reddit_posts(
     subreddit: str,
     time_filter: str = "day",
     limit: int = 10
-) -> List[Tuple[str, str]]:
+) -> Tuple[List[Tuple[str, str]], List[str]]:
     
     """
     Fetches the top text-based reddit posts from a specific subreddit
@@ -37,6 +37,8 @@ def get_top_reddit_posts(
     
     top_reddit_posts: List[Tuple[str, str]] = []
 
+    downloaded_files: List[str] = []
+
     for p in posts:
         if not p.stickied:
             if p.is_self:
@@ -47,8 +49,8 @@ def get_top_reddit_posts(
                     'outtmpl': 'input/mp4/%(title)s.%(ext)s',
                 }
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    ydl.download([p.url])
-    
-    return top_reddit_posts
+                    info = ydl.extract_info(p.url, download=True)
+                    filename = ydl.prepare_filename(info)
+                    downloaded_files.append(os.path.basename(filename))
 
-get_top_reddit_posts(subreddit="funnyanimals",limit=1)
+    return top_reddit_posts, downloaded_files
