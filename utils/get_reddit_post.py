@@ -32,10 +32,12 @@ def get_top_reddit_posts(
         user_agent=user_agent,
     )
 
+    posts = reddit.subreddit(subreddit).top(time_filter=time_filter,limit=limit)
+    
     top_reddit_posts: List[Tuple[str, str]] = []
 
-    for submission in reddit.subreddit(subreddit).top(time_filter=time_filter,limit=limit):
-        if submission.is_self and not submission.stickied:
-            top_reddit_posts.append((submission.title, submission.selftext))
+    for p in posts:
+        if p.is_self and not p.stickied:
+            top_reddit_posts.append((p.title, p.selftext, p.url))
     
     return top_reddit_posts
