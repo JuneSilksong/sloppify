@@ -43,10 +43,12 @@ def get_top_reddit_posts(
         if not p.stickied:
             if p.is_self:
                 top_reddit_posts.append((p.title, p.selftext))
+                print(p.title)
             if p.is_video:
+                print(p.title)
                 ydl_opts = {
                     'format': 'bv',
-                    'outtmpl': 'input/mp4/%(title)s.%(ext)s',
+                    'outtmpl': f'input/content_video/{p.title}.mp4',
                 }
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(p.url, download=True)
@@ -54,3 +56,5 @@ def get_top_reddit_posts(
                     downloaded_files.append(os.path.basename(filename))
 
     return top_reddit_posts, downloaded_files
+
+get_top_reddit_posts(subreddit="funnyanimals", limit=10, time_filter="year")
