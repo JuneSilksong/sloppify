@@ -1,6 +1,7 @@
 import os
 import praw
 import yt_dlp
+import emoji
 from dotenv import load_dotenv
 from typing import List, Tuple
 
@@ -39,22 +40,31 @@ def get_top_reddit_posts(
 
     downloaded_files: List[str] = []
 
+    titles: List[str] = []
+
     for p in posts:
         if not p.stickied:
             if p.is_self:
                 top_reddit_posts.append((p.title, p.selftext))
                 print(p.title)
             if p.is_video:
-                print(p.title)
+                title = p.title.replace('\r', '').replace('\n', '')
+                title_noemoji = emoji.replace_emoji(title, replace='')
+
+                # temp fix for emoji only titles
+                if title_noemoji != "":
+                    title = title_noemoji
+                if title == "": # probably unnecessary but will check later
+                    title = "."
+                    
+                titles.append(title)
                 ydl_opts = {
                     'format': 'bv',
-                    'outtmpl': f'input/content_video/{p.title}.mp4',
+                    'outtmpl': f'input/content_video/{title}.mp4',
                 }
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(p.url, download=True)
                     filename = ydl.prepare_filename(info)
                     downloaded_files.append(os.path.basename(filename))
 
-    return top_reddit_posts, downloaded_files
-
-get_top_reddit_posts(subreddit="funnyanimals", limit=10, time_filter="year")
+    return top_reddit_posts, downloaded_files, titles
