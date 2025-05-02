@@ -31,13 +31,13 @@ def stitch_video(
         raise ValueError("content conflict between video and image")
 
     # Process video to 9:16
-    video = VideoFileClip(f"input/webm/{video_file}")
+    video = VideoFileClip(f"input/bg_video/{video_file}")
     resized = video.resize(height=height)
     cropped = resized.crop(x_center=resized.w/2, width=width)
 
     # Load music
     if music_file:
-        music = AudioFileClip(f"input/mp3/{music_file}")
+        music = AudioFileClip(f"input/bg_audio/{music_file}")
     else:
         music = None
     
@@ -60,7 +60,7 @@ def stitch_video(
 
     # Process content video
     if content_video_file:
-        content_video = VideoFileClip(f"input/mp4/{content_video_file}")
+        content_video = VideoFileClip(f"input/content_video/{content_video_file}")
         if content_video.h/16 >= content_video.w/9:
             content_resized = content_video.resize(height=content_height)
         else:
@@ -88,15 +88,25 @@ def stitch_video(
 
     # Alternatively, add the content (no subtitles)
     elif content_resized:
-        wrapped_txt = textwrap.fill(os.path.splitext(content_video_file)[0],width=30)
+        txt_to_wrap = os.path.splitext(content_video_file)[0]
+        if len(txt_to_wrap) > 60:
+            fontsize=40
+            stroke_width=2
+            wrap_width=30
+        else:
+            fontsize=54
+            stroke_width=3
+            wrap_width=20
+        wrapped_txt = textwrap.fill(txt_to_wrap,width=wrap_width)
         print(wrapped_txt, wrapped_txt.count('\n'))
-        fontsize = 40
-        y_pos = 0.05 - ((wrapped_txt.count('\n') + 1) * fontsize - fontsize) / 2 / 1080
-        txt = TextClip(wrapped_txt, fontsize=fontsize, color='white', stroke_color='black', stroke_width=2, font='Segoe-UI-Black', method='caption', size=(content_width-20, None))
+        txt_height = ((wrapped_txt.count('\n') + 1) * (fontsize*1.4))
+        txt_pos = (height - txt_height - content_resized.h) / 2 / height
+        content_pos = ((height - txt_height - content_resized.h) / 2 + txt_height + 20) / height
+        txt = TextClip(wrapped_txt, fontsize=fontsize, color='yellow', stroke_color='black', stroke_width=stroke_width, font='Segoe-UI-Black', method='caption', size=(width, None))
         txt = txt.set_start(0).set_duration(cropped.duration)
-        txt = txt.set_position(('center', y_pos), relative=True)
-        print("Content video duration:", content_video.duration)
-        final = CompositeVideoClip(([cropped] + [content_resized.set_position(('center', 0.15), relative=True)] + [txt]))
+        txt = txt.set_position(('center', txt_pos), relative=True)
+        print(txt_height, content_resized.h, txt_pos, content_pos, height)
+        final = CompositeVideoClip(([cropped] + [content_resized.set_position(('center', content_pos), relative=True)] + [txt]))
     
     # Crop video to duration length and write
     final = final.subclip(0, duration)
