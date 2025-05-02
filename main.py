@@ -18,34 +18,34 @@ load_dotenv('reddit_api.env')
 
 if __name__ == "__main__":
 
-    subreddit = input("subreddit: r/")
-    posts = get_top_reddit_posts(subreddit, limit=POST_LIMIT)
+    subreddit = input("subreddit: r/") # input subreddit name
+    posts = get_top_reddit_posts(subreddit, limit=POST_LIMIT) # get top posts from subreddit
 
     if not posts:
-        print("No posts found in the subreddit or there was an issue.")
+        print("No posts found in the subreddit or there was an issue.") # handle empty posts
     else:
-        print(f"Found {len(posts)} posts in subreddit '{subreddit}'")
+        print(f"Found {len(posts)} posts in subreddit '{subreddit}'") # print number of posts found
 
-        for i, (title, selftext) in enumerate(posts):
+        for i, (title, selftext) in enumerate(posts): # iterate through posts
             print(f"\nProcessing Post {i + 1}:")
             print(f"Title: {title}")
             print(f"Selftext: {selftext}")
 
-            post_id     = f"{subreddit}_{title[:10]}_{i+1}"
-            current_time = datetime.datetime.now().strftime("%Y-%m-%d")
-            final_audio  = os.path.join(AUDIO_OUTPUT_FOLDER, f"{subreddit}_{current_time}_post{i+1}.mp3")
+            post_id     = f"{subreddit}_{title[:10]}_{i+1}" # create unique post ID
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d") # get current date
+            final_audio  = os.path.join(AUDIO_OUTPUT_FOLDER, f"{subreddit}_{current_time}_post{i+1}.mp3") # create final audio file path and name
 
             if is_post_processed(post_id) and os.path.exists(final_audio):
-                print(f"Audio for post {post_id} already processed; skipping TTS.")
+                print(f"Audio for post {post_id} already processed; skipping TTS.") # check if post is already processed and audio file exists
             else:
                 if is_post_processed(post_id):
                     print(f"Post {post_id} was marked processed but {final_audio} is missing—regenerating.")
                 else:
                     print(f"Generating TTS for post {post_id}…")
 
-                text = f"{title}\n{selftext}"
-                text = preprocess_text(text)
-                chunks = text_to_chunks(text)
+                text = f"{title}\n{selftext}" # combine title and selftext
+                text = preprocess_text(text) # send text to preprocessor for clean up before tts
+                chunks = text_to_chunks(text) # break up preprocessed text into chunks
 
                 os.makedirs(AUDIO_OUTPUT_FOLDER, exist_ok=True)
                 part_files = []
