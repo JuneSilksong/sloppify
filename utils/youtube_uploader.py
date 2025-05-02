@@ -47,12 +47,11 @@ def upload_to_youtube(file_path, title, description, tags=[], categoryId="22", p
     response = request.execute()
     print("Video uploaded:", response["id"])
 
-"""
+
 upload_to_youtube(
     file_path="output/test.mp4",
     title="test_title",
     description="test_description",
-    tags=["reddit","tifu","tts","tiktok"],
+    tags=["reddit","tifu","animal","funny","tts","tiktok"],
     privacyStatus="private"
 )
-"""

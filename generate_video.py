@@ -12,10 +12,10 @@ from typing import List, Tuple
 from utils.get_reddit_post import get_top_reddit_posts
 from utils.video_stitcher import stitch_video
 
-content_file_path = 'input/mp4/downloaded_files.txt'
+# content_file_path = 'input/content_video/downloaded_files.txt'
 
-def generate_video(subreddit: str="funnyanimals", limit: int=1):
-    top_reddit_posts, downloaded_files = get_top_reddit_posts(subreddit=subreddit,limit=limit)
+def generate_video(subreddit: str="funnyanimals", limit: int=1, time_filter: str="day"):
+    top_reddit_posts, downloaded_files = get_top_reddit_posts(subreddit=subreddit,limit=limit,time_filter=time_filter)
 
     if subreddit == "funnyanimals":
         video_file = "nature_drone.mkv"
@@ -27,4 +27,4 @@ def generate_video(subreddit: str="funnyanimals", limit: int=1):
     for content_video_file in downloaded_files:
         stitch_video(video_file=video_file,music_file=music_file,content_video_file=content_video_file)
 
-generate_video(limit=2)
+generate_video(subreddit="funnyanimals", limit=10, time_filter="year")
