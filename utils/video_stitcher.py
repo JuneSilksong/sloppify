@@ -68,6 +68,8 @@ def stitch_video(
     
     # Set background video to start at random point and attach any audio
     duration = max(content_video.duration if content_video_file else 0, tts_audio.duration if tts_audio else 0)
+    if duration > 60:
+        duration = 60
     if duration == 0:
         duration = 10
     start_time = random.randint(1,int(video.duration-duration-10))
@@ -88,7 +90,7 @@ def stitch_video(
 
     # Alternatively, add the content (no subtitles)
     elif content_resized:
-        txt_to_wrap = os.path.splitext(content_video_file)[0]
+        txt_to_wrap = title if title else os.path.splitext(content_video_file)[0]
         if len(txt_to_wrap) > 60:
             fontsize=40
             stroke_width=2
@@ -110,4 +112,4 @@ def stitch_video(
     
     # Crop video to duration length and write
     final = final.subclip(0, duration)
-    final.write_videofile(f"output/{title if title else content_video_file if content_video_file else None}", codec="libx264", audio_codec="aac", fps=60)
+    final.write_videofile(f"output/{content_video_file if content_video_file else None}.mp4", codec="libx264", audio_codec="aac", fps=60)
