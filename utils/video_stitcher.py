@@ -111,5 +111,5 @@ def stitch_video(
     final = final.subclip(0, duration)
 
     os.makedirs("output", exist_ok=True)
-    output_filename = f"output/{title if title else 'output'}.mp4"
+    output_filename = f"output/{title if title else content_video_file if content_video_file else 'output'}.mp4"
     final.write_videofile(output_filename, codec="libx264", audio_codec="aac", fps=60)
