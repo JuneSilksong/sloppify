@@ -12,6 +12,7 @@ def transcriber(audio_file: str, model_size: str = "base.en"):
     Returns full transcription text plus segments with per-word timing.
     """
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Using device: {device} ({torch.cuda.get_device_name(0) if device == 'cuda' else 'CPU'})")
     model = whisper.load_model(model_size).to(device)
     result = model.transcribe(audio_file, word_timestamps=True)
     return result["text"], result["segments"]
