@@ -1,9 +1,11 @@
 input/
 output/
 sloppify-venv/
+__pycache__/
 *.json
 *.pickle
 *.srt
 *.wav
 *.mp3
 *.pyc
+*.mp4
