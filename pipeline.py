@@ -1,5 +1,6 @@
 import os
 import datetime
+import re
 from utils.get_reddit_post import get_top_reddit_posts
 from utils.text_preprocessor import preprocess_text, text_to_chunks
 from utils.tts import tts_output
@@ -12,7 +13,11 @@ VOICE_ID = "pNInz6obpgDQGcFmaJgB"
 AUDIO_OUTPUT_FOLDER = "input/tts"
 SUBTITLE_OUTPUT_FOLDER = "input/srt"
 BACKGROUND_VIDEO = "youtube_minecraft_parkour_1440p-001.mp4"
-BACKGROUND_MUSIC = "youtube_joyful_chess.mp3"    
+BACKGROUND_MUSIC = "youtube_joyful_chess.mp3"
+
+def sanitize_filename(text: str) -> str:
+    # Remove illegal characters and limit length
+    return re.sub(r'[\\/*?:"<>|]', "", text).strip()   
 
 def process_post(subreddit: str, title: str, body: str, post_id: str):
     if is_post_processed(post_id):
@@ -56,13 +61,16 @@ def process_post(subreddit: str, title: str, body: str, post_id: str):
     )
 
     # Stitch final video
+
+    safe_title = sanitize_filename(title)
+
     print("→ Stitching final video...")
     stitch_video(
         video_file=BACKGROUND_VIDEO,
         music_file=BACKGROUND_MUSIC,
         tts_audio_file=final_audio_file,
         tts_srt_file=final_srt_file,
-        title=title
+        title=safe_title,
     )
 
     mark_post_as_processed(post_id)

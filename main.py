@@ -8,7 +8,7 @@ load_dotenv("reddit.env")
 
 if __name__ == "__main__":
     subreddit = input("Subreddit: r/")
-    posts,_,_ = get_top_reddit_posts(subreddit, limit=10, time_filter="day")
+    posts,_,_ = get_top_reddit_posts(subreddit, limit=10, time_filter="week")
 
     if not posts:
         print("No posts found or error.")
