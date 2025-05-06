@@ -7,42 +7,62 @@ from utils.subtitles import transcriber, generate_srt
 from utils.post_track import is_post_processed, mark_post_as_processed
 from utils.video_stitcher import stitch_video
 
-AUDIO_OUTPUT_FOLDER = "audio_output"
-SUBTITLE_OUTPUT_FOLDER = "subtitles_output"
+# Constants
 VOICE_ID = "pNInz6obpgDQGcFmaJgB"
-
-BACKGROUND_VIDEO = "input/bg_video/youtube_minecraft_parkour_1440p-001.mp4"
-VIDEO_OUTPUT_FOLDER = "video_output"
+AUDIO_OUTPUT_FOLDER = "input/tts"
+SUBTITLE_OUTPUT_FOLDER = "input/srt"
+BACKGROUND_VIDEO = "youtube_minecraft_parkour_1440p-001.mp4"
+BACKGROUND_MUSIC = "youtube_joyful_chess.mp3"    
 
 def process_post(subreddit: str, title: str, body: str, post_id: str):
     if is_post_processed(post_id):
         print(f"Post {post_id} already processed. Skipping...")
         return
 
+    print(f"→ Processing post: {post_id}")
     text = f"{title}\n{body}"
     preprocessed = preprocess_text(text)
     chunks = text_to_chunks(preprocessed)
 
     os.makedirs(AUDIO_OUTPUT_FOLDER, exist_ok=True)
     os.makedirs(SUBTITLE_OUTPUT_FOLDER, exist_ok=True)
-    os.makedirs(VIDEO_OUTPUT_FOLDER, exist_ok=True)
 
     date_str = datetime.datetime.now().strftime("%Y-%m-%d")
+
+    final_audio_file = f"{subreddit}_{date_str}_{post_id}.mp3"
+    final_srt_file = f"{subreddit}_{date_str}_{post_id}.srt"
+
+    # Merge all TTS chunks into one audio file
+    chunk_paths = []
     for i, chunk in enumerate(chunks):
-        base_filename = f"{subreddit}_{date_str}_part{i+1}"
-        audio_file = os.path.join(AUDIO_OUTPUT_FOLDER, f"{base_filename}.mp3")
-        srt_file   = os.path.join(SUBTITLE_OUTPUT_FOLDER, f"{base_filename}.srt")
-        final_video = os.path.join(VIDEO_OUTPUT_FOLDER, f"{base_filename}.mp4")
+        chunk_path = os.path.join(AUDIO_OUTPUT_FOLDER, f"{subreddit}_{date_str}_part{i+1}.mp3")
+        print(f"→ Generating TTS: {chunk_path}")
+        tts_output(chunk, voice_id=VOICE_ID, filename=chunk_path)
+        chunk_paths.append(chunk_path)
 
-        tts_output(chunk, voice_id=VOICE_ID, filename=audio_file)
-        transcript, segments = transcriber(audio_file)
-        generate_srt(segments, audio_file=audio_file, output_folder=SUBTITLE_OUTPUT_FOLDER)
+    # Concatenate audio parts
+    print(f"→ Merging audio into: {final_audio_file}")
+    os.system(f"ffmpeg -y -i \"concat:{'|'.join(chunk_paths)}\" -acodec copy \"{os.path.join(AUDIO_OUTPUT_FOLDER, final_audio_file)}\"")
 
-        stitch_video(
-            audio_path=audio_file,
-            subtitle_path=srt_file,
-            output_path=final_video,
-            background_video_path=BACKGROUND_VIDEO
-        )
+    # Transcribe merged audio and generate subtitles
+    print(f"→ Transcribing and generating subtitles for: {final_audio_file}")
+    transcript, segments = transcriber(os.path.join(AUDIO_OUTPUT_FOLDER, final_audio_file))
+    print(f"Transcript:\n{transcript}\n")
+    generate_srt(
+        segments,
+        audio_file=os.path.join(AUDIO_OUTPUT_FOLDER, final_audio_file),
+        output_folder=SUBTITLE_OUTPUT_FOLDER,
+        max_words=2
+    )
+
+    # Stitch final video
+    print("→ Stitching final video...")
+    stitch_video(
+        video_file=BACKGROUND_VIDEO,
+        music_file=BACKGROUND_MUSIC,
+        tts_audio_file=final_audio_file,
+        tts_srt_file=final_srt_file,
+        title=title
+    )
 
     mark_post_as_processed(post_id)

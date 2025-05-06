@@ -57,7 +57,8 @@ def generate_srt(
         is_sentence_end = word_text.endswith(('.', ',', '!', '?'))
         is_hyphen_next  = (i+1 < n) and words[i+1].get("word", "").startswith("-")
 
-        if is_sentence_end or (len(chunk) >= max_words and not is_hyphen_next):
+        word_count = sum(1 for token in chunk if token["word"].strip().isalnum() or "-" in token["word"])
+        if is_sentence_end or (word_count >= max_words and not is_hyphen_next):
             subs.append(chunk)
             chunk = []
 

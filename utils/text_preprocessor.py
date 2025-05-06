@@ -16,8 +16,6 @@ def preprocess_text(text):
         r"OMG": "oh my glob",
         r"porn": "corn",
         r"WTF": "WHAT THE FLIP!",
-        r"and": "&",
-        r"an": "&",
         r"cum": "splooge",
         r"cummed": "shot rope",
         r"suicide": "sewer slide",

@@ -68,10 +68,7 @@ def stitch_video(
     
     # Set background video to start at random point and attach any audio
     duration = max(content_video.duration if content_video_file else 0, tts_audio.duration if tts_audio else 0)
-    if duration > 60:
-        duration = 60
-    if duration == 0:
-        duration = 10
+
     start_time = random.randint(1,int(video.duration-duration-10))
     cropped = cropped.subclip(start_time)
     if audio:
@@ -112,4 +109,7 @@ def stitch_video(
     
     # Crop video to duration length and write
     final = final.subclip(0, duration)
-    final.write_videofile(f"output/{content_video_file if content_video_file else None}.mp4", codec="libx264", audio_codec="aac", fps=60)
+
+    os.makedirs("output", exist_ok=True)
+    output_filename = f"output/{title if title else 'output'}.mp4"
+    final.write_videofile(output_filename, codec="libx264", audio_codec="aac", fps=60)

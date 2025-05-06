@@ -8,11 +8,12 @@ load_dotenv("reddit.env")
 
 if __name__ == "__main__":
     subreddit = input("Subreddit: r/")
-    posts = get_top_reddit_posts(subreddit, limit=1)
+    posts,_,_ = get_top_reddit_posts(subreddit, limit=10, time_filter="day")
 
     if not posts:
         print("No posts found or error.")
     else:
-        for i, (title, body, post_id) in enumerate(posts):
+        for i, (title, body) in enumerate(posts):
+            post_id = f"{subreddit}_{title[:10]}_{i+1}"
             print(f"\nProcessing Post {i+1} — {post_id}:")
             process_post(subreddit, title, body, post_id)
