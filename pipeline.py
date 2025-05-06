@@ -4,7 +4,7 @@ from utils.get_reddit_post import get_top_reddit_posts
 from utils.text_preprocessor import preprocess_text, text_to_chunks
 from utils.tts import tts_output
 from utils.subtitles import transcriber, generate_srt
-from utils.post_track import has_been_processed, mark_post_as_processed
+from utils.post_track import is_post_processed, mark_post_as_processed
 from utils.video_stitcher import stitch_video
 
 AUDIO_OUTPUT_FOLDER = "audio_output"
@@ -15,7 +15,7 @@ BACKGROUND_VIDEO = "input/bg_video/youtube_minecraft_parkour_1440p-001.mp4"
 VIDEO_OUTPUT_FOLDER = "video_output"
 
 def process_post(subreddit: str, title: str, body: str, post_id: str):
-    if has_been_processed(post_id):
+    if is_post_processed(post_id):
         print(f"Post {post_id} already processed. Skipping...")
         return
 
