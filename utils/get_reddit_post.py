@@ -59,8 +59,9 @@ def get_top_reddit_posts(
                     
                 titles.append(title)
                 ydl_opts = {
-                    'format': 'bv',
+                    'format': 'bestvideo+bestaudio',
                     'outtmpl': f'input/content_video/{title}.mp4',
+                    'merge_output_format': 'mp4',
                 }
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(p.url, download=True)
@@ -68,3 +69,5 @@ def get_top_reddit_posts(
                     downloaded_files.append(os.path.basename(filename))
 
     return top_reddit_posts, downloaded_files, titles
+
+get_top_reddit_posts(subreddit="funnyanimals", time_filter="year",limit=1)
