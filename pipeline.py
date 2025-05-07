@@ -51,7 +51,9 @@ def process_post(subreddit: str, title: str, body: str, post_id: str):
 
     # Concatenate audio parts
     print(f"→ Merging audio into: {final_audio_path}")
-    os.system(f"ffmpeg -y -i \"concat:{'|'.join(chunk_paths)}\" -acodec copy \"{final_audio_path}\"")
+    
+    # ffmpeg command to concatenate audio files, sys = terminal
+    os.system(f"ffmpeg -y -i \"concat:{'|'.join(chunk_paths)}\" -acodec copy \"{final_audio_path}\"") 
 
     # Transcribe merged audio and generate subtitles
     print(f"→ Transcribing and generating subtitles for: {final_audio_path}")
