@@ -1,12 +1,16 @@
 from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, TextClip
-from typing import List, Tuple
 import textwrap
 import random
 import pysrt
 from moviepy.config import change_settings
 import os
+import re
 
 change_settings({"IMAGEMAGICK_BINARY": r"C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe"})
+
+def sanitize_filename(text: str) -> str:
+    # Remove illegal characters and limit length
+    return re.sub(r'[\\/*?:"<>|]', "", text).strip()   
 
 def stitch_video(
     video_file: str = None,
@@ -22,6 +26,8 @@ def stitch_video(
     width=810
     content_height=1120
     content_width=630
+
+    title = sanitize_filename(title)
 
     # Check if we have background video
     if not video_file:
@@ -65,9 +71,16 @@ def stitch_video(
             content_resized = content_video.resize(height=content_height)
         else:
             content_resized = content_video.resize(width=content_width)
+        if content_video.audio:
+            print("content video audio")
+            muted_audio = content_video.audio.volumex(-0.7)
+            audio = CompositeAudioClip([muted_audio, audio])
+            print(content_video.audio.volumex)
     
     # Set background video to start at random point and attach any audio
     duration = max(content_video.duration if content_video_file else 0, tts_audio.duration if tts_audio else 0)
+    if duration > 179:
+        duration = 179
 
     start_time = random.randint(1,int(video.duration-duration-10))
     cropped = cropped.subclip(start_time)
