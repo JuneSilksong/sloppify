@@ -1,6 +1,7 @@
 import os
 import datetime
 import re
+
 from utils.get_reddit_post import get_top_reddit_posts
 from utils.text_preprocessor import preprocess_text, text_to_chunks
 from utils.tts import tts_output
@@ -8,16 +9,18 @@ from utils.subtitles import transcriber, generate_srt
 from utils.post_track import is_post_processed, mark_post_as_processed
 from utils.video_stitcher import stitch_video
 
-# Constants
-VOICE_ID = "pNInz6obpgDQGcFmaJgB"
-AUDIO_OUTPUT_FOLDER = "input/tts"
-SUBTITLE_OUTPUT_FOLDER = "input/srt"
-BACKGROUND_VIDEO = "youtube_minecraft_parkour_1440p-001.mp4"
-BACKGROUND_MUSIC = "youtube_joyful_chess.mp3"
+# Import all constants from config.py
+from config import (
+    VOICE_ID,
+    AUDIO_OUTPUT_FOLDER,
+    SUBTITLE_OUTPUT_FOLDER,
+    BACKGROUND_VIDEO,
+    BACKGROUND_MUSIC,
+)
 
 def sanitize_filename(text: str) -> str:
     # Remove illegal characters and limit length
-    return re.sub(r'[\\/*?:"<>|]', "", text).strip()   
+    return re.sub(r'[\\/*?:"<>|]', "", text).strip()
 
 def process_post(subreddit: str, title: str, body: str, post_id: str):
     if is_post_processed(post_id):
@@ -33,9 +36,10 @@ def process_post(subreddit: str, title: str, body: str, post_id: str):
     os.makedirs(SUBTITLE_OUTPUT_FOLDER, exist_ok=True)
 
     date_str = datetime.datetime.now().strftime("%Y-%m-%d")
-
     final_audio_file = f"{subreddit}_{date_str}_{post_id}.mp3"
+    final_audio_path = os.path.join(AUDIO_OUTPUT_FOLDER, final_audio_file)
     final_srt_file = f"{subreddit}_{date_str}_{post_id}.srt"
+    final_srt_path = os.path.join(SUBTITLE_OUTPUT_FOLDER, final_srt_file)
 
     # Merge all TTS chunks into one audio file
     chunk_paths = []
@@ -46,24 +50,24 @@ def process_post(subreddit: str, title: str, body: str, post_id: str):
         chunk_paths.append(chunk_path)
 
     # Concatenate audio parts
-    print(f"→ Merging audio into: {final_audio_file}")
-    os.system(f"ffmpeg -y -i \"concat:{'|'.join(chunk_paths)}\" -acodec copy \"{os.path.join(AUDIO_OUTPUT_FOLDER, final_audio_file)}\"")
+    print(f"→ Merging audio into: {final_audio_path}")
+    
+    # ffmpeg command to concatenate audio files, sys = terminal
+    os.system(f"ffmpeg -y -i \"concat:{'|'.join(chunk_paths)}\" -acodec copy \"{final_audio_path}\"") 
 
     # Transcribe merged audio and generate subtitles
-    print(f"→ Transcribing and generating subtitles for: {final_audio_file}")
-    transcript, segments = transcriber(os.path.join(AUDIO_OUTPUT_FOLDER, final_audio_file))
+    print(f"→ Transcribing and generating subtitles for: {final_audio_path}")
+    transcript, segments = transcriber(final_audio_path)
     print(f"Transcript:\n{transcript}\n")
     generate_srt(
         segments,
-        audio_file=os.path.join(AUDIO_OUTPUT_FOLDER, final_audio_file),
+        audio_file=final_audio_path,
         output_folder=SUBTITLE_OUTPUT_FOLDER,
         max_words=2
     )
 
     # Stitch final video
-
     safe_title = sanitize_filename(title)
-
     print("→ Stitching final video...")
     stitch_video(
         video_file=BACKGROUND_VIDEO,
