@@ -8,10 +8,6 @@ import re
 
 change_settings({"IMAGEMAGICK_BINARY": r"C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe"})
 
-def sanitize_filename(text: str) -> str:
-    # Remove illegal characters and limit length
-    return re.sub(r'[\\/*?:"<>|]', "", text).strip()   
-
 def stitch_video(
     video_file: str = None,
     music_file: str = None,
@@ -26,8 +22,6 @@ def stitch_video(
     width=810
     content_height=1120
     content_width=630
-
-    title = sanitize_filename(title)
 
     # Check if we have background video
     if not video_file:

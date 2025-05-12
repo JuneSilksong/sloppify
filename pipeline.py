@@ -2,7 +2,7 @@ import os
 import datetime
 import re
 
-from utils.get_reddit_post import get_top_reddit_posts
+from utils.get_reddit_post import get_top_reddit_posts, sanitize_filename
 from utils.text_preprocessor import preprocess_text, text_to_chunks
 from utils.tts import tts_output
 from utils.subtitles import transcriber, generate_srt
@@ -17,10 +17,6 @@ from config import (
     BACKGROUND_VIDEO,
     BACKGROUND_MUSIC,
 )
-
-def sanitize_filename(text: str) -> str:
-    # Remove illegal characters and limit length
-    return re.sub(r'[\\/*?:"<>|]', "", text).strip()
 
 def process_post(subreddit: str, title: str, body: str, post_id: str):
     if is_post_processed(post_id):

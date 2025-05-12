@@ -4,6 +4,11 @@ import yt_dlp
 import emoji
 from dotenv import load_dotenv
 from typing import List, Tuple
+import re
+
+def sanitize_filename(text: str) -> str:
+    # Remove illegal characters and limit length
+    return re.sub(r'[\\/*?:"<>|]', "", text).strip()   
 
 def get_top_reddit_posts(
     subreddit: str,
@@ -56,18 +61,18 @@ def get_top_reddit_posts(
                     title = title_noemoji
                 if title == "": # probably unnecessary but will check later
                     title = "."
+                sanitized_title = sanitize_filename(title)
                     
-                titles.append(title)
+                titles.append(sanitized_title)
                 ydl_opts = {
-                    'format': 'bestvideo+bestaudio',
-                    'outtmpl': f'input/content_video/{title}.mp4',
+                    'format': 'bestvideo+bestaudio/best',
+                    'outtmpl': f'input/content_video/{title}.%(ext)s',
                     'merge_output_format': 'mp4',
                 }
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    info = ydl.extract_info(p.url, download=True)
-                    filename = ydl.prepare_filename(info)
-                    downloaded_files.append(os.path.basename(filename))
+                    if not os.path.exists(f'output/{sanitized_title}.mp4'):
+                        info = ydl.extract_info(p.url, download=True)
+                        filename = ydl.prepare_filename(info)
+                        downloaded_files.append(os.path.basename(filename))
 
     return top_reddit_posts, downloaded_files, titles
-
-get_top_reddit_posts(subreddit="funnyanimals", time_filter="year",limit=1)
