@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 from utils.get_reddit_post import get_top_reddit_posts
 from pipeline import process_post
-from config import (POST_LIMIT, TIME_FRAME
- 
+from config import (POST_LIMIT, 
+                    TIME_FRAME
 )
 
 load_dotenv("eleven_labs.env")
