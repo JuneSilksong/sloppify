@@ -62,8 +62,6 @@ def get_top_reddit_posts(
                 if title == "": # probably unnecessary but will check later
                     title = "."
                 sanitized_title = sanitize_filename(title)
-                    
-                titles.append(sanitized_title)
                 ydl_opts = {
                     'format': 'bestvideo+bestaudio/best',
                     'outtmpl': f'input/content_video/{title}.%(ext)s',
@@ -74,5 +72,6 @@ def get_top_reddit_posts(
                         info = ydl.extract_info(p.url, download=True)
                         filename = ydl.prepare_filename(info)
                         downloaded_files.append(os.path.basename(filename))
+                        titles.append(sanitized_title)
 
     return top_reddit_posts, downloaded_files, titles
