@@ -48,30 +48,34 @@ def get_top_reddit_posts(
     titles: List[str] = []
 
     for p in posts:
-        if not p.stickied:
-            if p.is_self:
-                top_reddit_posts.append((p.title, p.selftext))
-                print(p.title)
-            if p.is_video:
-                title = p.title.replace('\r', '').replace('\n', '')
-                title_noemoji = emoji.replace_emoji(title, replace='')
+        if p.stickied:
+            continue
+        if p.is_self:
+            top_reddit_posts.append((p.title, p.selftext))
+            print(p.title)
+            continue
+        if not p.is_video:
+            continue
 
-                # temp fix for emoji only titles
-                if title_noemoji != "":
-                    title = title_noemoji
-                if title == "": # probably unnecessary but will check later
-                    title = "."
-                sanitized_title = sanitize_filename(title)
-                ydl_opts = {
-                    'format': 'bestvideo+bestaudio/best',
-                    'outtmpl': f'input/content_video/{title}.%(ext)s',
-                    'merge_output_format': 'mp4',
-                }
-                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    if not os.path.exists(f'output/{sanitized_title}.mp4'):
-                        info = ydl.extract_info(p.url, download=True)
-                        filename = ydl.prepare_filename(info)
-                        downloaded_files.append(os.path.basename(filename))
-                        titles.append(sanitized_title)
+        title = p.title.replace('\r', '').replace('\n', '')
+        title_noemoji = emoji.replace_emoji(title, replace='')
+
+        # temp fix for emoji only titles
+        if title_noemoji != "":
+            title = title_noemoji
+        if title == "": # probably unnecessary but will check later
+            title = "."
+        sanitized_title = sanitize_filename(title)
+        ydl_opts = {
+            'format': 'bestvideo+bestaudio/best',
+            'outtmpl': f'input/content_video/{title}.%(ext)s',
+            'merge_output_format': 'mp4',
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            if not os.path.exists(f'output/{sanitized_title}.mp4'):
+                info = ydl.extract_info(p.url, download=True)
+                filename = ydl.prepare_filename(info)
+                downloaded_files.append(os.path.basename(filename))
+                titles.append(sanitized_title)
 
     return top_reddit_posts, downloaded_files, titles
