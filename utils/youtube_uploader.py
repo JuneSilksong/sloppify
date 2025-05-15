@@ -19,9 +19,19 @@ def get_authenticated_service():
             credentials = pickle.load(token)
 
     if not credentials or not credentials.valid:
+        print("Credentials invalid...")
         if credentials and credentials.expired and credentials.refresh_token:
-            credentials.refresh(Request())
+            print("Attempting to refresh...")
+            try:
+                credentials.refresh(Request())
+                print("Credentials refreshed.")
+            except Exception as e:
+                print(f"Refresh failed: {e}")
+                print("Falling back to OAuth flow...")
+                flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file("client_secrets.json", scopes)
+                credentials = flow.run_local_server(port=8080)
         else:
+            print("Obtaining credentials via OAuth flow...")
             flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file("client_secrets.json", scopes)
             credentials = flow.run_local_server(port=8080)
         with open("token.pickle", "wb") as token:
