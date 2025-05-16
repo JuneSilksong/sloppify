@@ -9,7 +9,7 @@ import yt_dlp
 from dotenv import load_dotenv
 from typing import List, Tuple
 
-from utils.get_reddit_post import get_top_reddit_posts
+from utils.get_reddit_post import get_top_reddit_posts, sanitize_filename
 from utils.video_stitcher import stitch_video
 
 # content_file_path = 'input/content_video/downloaded_files.txt'

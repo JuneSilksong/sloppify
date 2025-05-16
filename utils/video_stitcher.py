@@ -72,12 +72,28 @@ def stitch_video(
             print(content_video.audio.volumex)
     
     # Set background video to start at random point and attach any audio
-    duration = max(content_video.duration if content_video_file else 0, tts_audio.duration if tts_audio else 0)
-    if duration > 179:
-        duration = 179
+    duration = max(
+        tts_audio.duration if tts_audio else 0,
+        content_video.duration if content_video_file else 0
+    )
+    duration = min(duration, 142)
 
-    start_time = random.randint(1,int(video.duration-duration-10))
-    cropped = cropped.subclip(start_time)
+    bg_limit    = video.duration
+    music_limit = music.duration if music else float("inf")
+    tts_limit   = tts_audio.duration if tts_audio else float("inf")
+    
+    media_limit = min(bg_limit, music_limit, tts_limit)
+
+
+    if duration > media_limit:
+        duration = media_limit - 1
+
+    max_start = max(0, int(media_limit - duration - 1))
+    start_time = random.randint(0, max_start)    
+
+
+    cropped = cropped.subclip(start_time, start_time + duration)
+   
     if audio:
         cropped = cropped.set_audio(audio)
 
